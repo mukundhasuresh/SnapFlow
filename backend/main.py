@@ -42,8 +42,8 @@ app.add_middleware(
 VIEWPORT_W   = 1440
 VIEWPORT_H   = 900
 SCROLL_STEP  = 700
-SCROLL_DELAY = 700
-FINAL_DELAY  = 2000
+SCROLL_DELAY = 400
+FINAL_DELAY  = 1000
 
 class CaptureRequest(BaseModel):
     url: str
@@ -61,12 +61,23 @@ async def _capture_task(url: str) -> list[bytes]:
     shots: list[bytes] = []
 
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        browser = await pw.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--no-first-run",
+                "--no-zygote",
+                "--single-process",
+            ]
+        )
         page = await browser.new_page(
             viewport={"width": VIEWPORT_W, "height": VIEWPORT_H}
         )
 
-        await page.goto(url, wait_until="networkidle", timeout=40_000)
+        await page.goto(url, wait_until="domcontentloaded", timeout=90_000)
 
         # Pass 1: scroll to trigger lazy images
         total_height = await page.evaluate("document.body.scrollHeight")
@@ -132,12 +143,23 @@ async def _preview_task(url: str) -> list[str]:
     shots: list[str] = []
 
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        browser = await pw.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--no-first-run",
+                "--no-zygote",
+                "--single-process",
+            ]
+        )
         page = await browser.new_page(
             viewport={"width": VIEWPORT_W, "height": VIEWPORT_H}
         )
 
-        await page.goto(url, wait_until="networkidle", timeout=40_000)
+        await page.goto(url, wait_until="domcontentloaded", timeout=90_000)
 
         total_height = await page.evaluate("document.body.scrollHeight")
         scrolled = 0

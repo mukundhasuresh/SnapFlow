@@ -31,9 +31,9 @@ export default function Home() {
     try {
       const fullUrl = url.startsWith('http') ? url : 'https://' + url
 
-      setTimeout(() => setProgress('Scrolling page to load all images...'), 1200)
-      setTimeout(() => setProgress('Capturing each section...'), 4000)
-      setTimeout(() => setProgress('Almost done...'), 8000)
+      setTimeout(() => setProgress('Waking up the server...'), 1000)
+      setTimeout(() => setProgress('Launching browser...'), 8000)
+      setTimeout(() => setProgress('Scrolling page to load all images...'), 16000)
 
       const res = await fetch(`${API}/preview`, {
         method: 'POST',
